@@ -8,7 +8,9 @@ class UsersController < ApplicationController
   end
 
   def new
-    @user = User.new
+    unless signed_in?
+      @user = User.new
+    end
   end
 
   def show
@@ -21,13 +23,15 @@ class UsersController < ApplicationController
   end
 
   def create
-    @user = User.new(params[:user])
-    if @user.save
-      sign_in @user
-      flash[:success] = "Welcome to the Sample App!"
-      redirect_to @user
-    else
-      render 'new'
+    unless signed_in?
+      @user = User.new(params[:user])
+      if @user.save
+        sign_in @user
+        flash[:success] = "Welcome to the Sample App!"
+        redirect_to @user
+      else
+        render 'new'
+      end
     end
   end
 
@@ -42,9 +46,11 @@ def update
  end
 
 def destroy
-  User.find(params[:id]).destroy
-  flash[:success] = "User destroyed."
-  redirect_to users_url
+  unless params[:id] == session[:id]
+    User.find(params[:id]).destroy
+    flash[:success] = "User destroyed."
+    redirect_to users_url
+  end
 end
 
 

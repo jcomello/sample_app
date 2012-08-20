@@ -41,9 +41,17 @@ describe "User pages" do
         end
 
         it { should have_link('delete', href: user_path(User.first)) }
+
         it "should be able to delete another user" do
           expect { click_link('delete') }.to change(User, :count).by(-1)
         end
+
+        it "should not be able to delete himself" do
+          if admin.id == user.id
+            expect { click_link('delete') }.to change(User, :count).by(0)
+          end
+        end
+
         it { should_not have_link('delete', href: user_path(admin)) }
       end
     end
@@ -94,7 +102,7 @@ describe "User pages" do
         fill_in "Name",                with: "Example User"
         fill_in "Email",                 with: "user@example.com"
         fill_in "Password",          with: "foobar"
-        fill_in "Confirmation",    with: "foobar"
+        fill_in "Confirm Password",    with: "foobar"
       end
 
       describe "after saving the user" do
@@ -122,7 +130,7 @@ describe "User pages" do
     describe "page" do
       it { should have_selector('h1', text: "Update your profile" ) }
       it { should have_selector('title', text: "Edit user" ) }
-      it { should have_link('change', href: "http://gravatar.com/emails" ) }
+      it { should have_link('Change', href: "http://gravatar.com/emails" ) }
     end
 
     describe "with invalid information" do
